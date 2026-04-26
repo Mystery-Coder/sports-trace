@@ -4,7 +4,7 @@ import { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { v4 as uuidv4 } from 'uuid';
 import { Upload, Check, Loader2, Download, Eye } from 'lucide-react';
-import Sidebar from '@/components/Sidebar';
+
 import Header from '@/components/Header';
 import FileUpload from '@/components/FileUpload';
 import WatermarkVisualizer from '@/components/WatermarkVisualizer';
@@ -124,7 +124,7 @@ export default function EmbedPage() {
 
   return (
     <div className="flex min-h-screen">
-      <Sidebar />
+     
       <main className="flex-1 flex flex-col">
         <Header title="Embed Pipeline" subtitle="Upload media → Embed invisible DNA → Register asset" />
         <div className="flex-1 p-8 space-y-6 relative z-10">

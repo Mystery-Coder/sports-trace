@@ -18,6 +18,8 @@ import {
   BarChart3,
   Lock,
   Dna,
+  AlertTriangle,
+  MapPin,
 } from 'lucide-react';
 
 const modules = [
@@ -82,6 +84,35 @@ export default function Sidebar() {
         </p>
         <nav className="flex flex-col gap-1">
           {modules[0].children!.map((item) => {
+            const Icon = item.icon;
+            const isActive = pathname === item.href;
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`sidebar-link ${isActive ? 'active' : ''}`}
+              >
+                <Icon size={18} />
+                <span>{item.label}</span>
+              </Link>
+            );
+          })}
+        </nav>
+      </div>
+
+      {/* Pre-Event Navigation */}
+      <div className="mb-4">
+        <p
+          className="px-3 mb-2 text-[10px] font-semibold tracking-widest uppercase"
+          style={{ color: 'var(--st-cyan-dim)' }}
+        >
+          Pre-Event (M2·M3)
+        </p>
+        <nav className="flex flex-col gap-1">
+          {[
+            { href: '/disruption', label: 'Disruption Monitor', icon: AlertTriangle },
+            { href: '/routes', label: 'Route Alternatives', icon: MapPin },
+          ].map((item) => {
             const Icon = item.icon;
             const isActive = pathname === item.href;
             return (

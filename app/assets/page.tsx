@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Database, Shield, Radio, Clock, FileImage, FileVideo, Search } from 'lucide-react';
-import Sidebar from '@/components/Sidebar';
+
 import Header from '@/components/Header';
 import { useSportTraceStore } from '@/lib/store';
 import type { Asset } from '@/lib/types';
@@ -25,7 +25,7 @@ export default function AssetsPage() {
 
   return (
     <div className="flex min-h-screen">
-      <Sidebar />
+      
       <main className="flex-1 flex flex-col">
         <Header title="Asset Registry" subtitle="Browse all watermarked assets stored in Firestore" />
         <div className="flex-1 p-8 space-y-6 relative z-10">

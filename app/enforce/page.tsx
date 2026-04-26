@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ShieldAlert, MapPin, Clock, Monitor, CheckCircle, Send, DollarSign, FileWarning } from 'lucide-react';
-import Sidebar from '@/components/Sidebar';
+
 import Header from '@/components/Header';
 import { useSportTraceStore } from '@/lib/store';
 import type { EnforcementAction } from '@/lib/types';
@@ -49,7 +49,7 @@ export default function EnforcePage() {
 
   return (
     <div className="flex min-h-screen">
-      <Sidebar />
+      
       <main className="flex-1 flex flex-col">
         <Header title="Enforcement Queue" subtitle="DMCA takedowns · Micro-license offers · Cloud Tasks simulation" />
         <div className="flex-1 p-8 space-y-8 relative z-10">

@@ -4,7 +4,6 @@ import { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Shield, Radio, ShieldAlert, Eye, EyeOff, DollarSign, AlertCircle, Dna, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
-import Sidebar from '@/components/Sidebar';
 import Header from '@/components/Header';
 import StatsCard from '@/components/StatsCard';
 import DetectionFeed from '@/components/DetectionFeed';
@@ -31,7 +30,7 @@ export default function Dashboard() {
 
   return (
     <div className="flex min-h-screen">
-      <Sidebar />
+      
       <main className="flex-1 flex flex-col">
         <Header title="M1 — Asset DNA Watermark" subtitle="Real-time digital asset protection dashboard" />
         <div className="flex-1 p-8 space-y-8 relative z-10">

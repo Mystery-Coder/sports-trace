@@ -4,7 +4,7 @@ import { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { v4 as uuidv4 } from 'uuid';
 import { ScanSearch, MapPin, Clock, Monitor, CheckCircle, AlertTriangle, XCircle, Radio } from 'lucide-react';
-import Sidebar from '@/components/Sidebar';
+
 import Header from '@/components/Header';
 import FileUpload from '@/components/FileUpload';
 import { useSportTraceStore } from '@/lib/store';
@@ -107,7 +107,7 @@ export default function DecodePage() {
 
   return (
     <div className="flex min-h-screen">
-      <Sidebar />
+      
       <main className="flex-1 flex flex-col">
         <Header title="Decode & Ping" subtitle="Scan media for hidden watermark DNA → fire detection ping" />
         <div className="flex-1 p-8 space-y-6 relative z-10">
