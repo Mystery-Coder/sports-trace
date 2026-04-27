@@ -128,6 +128,20 @@ export default function Sidebar() {
           })}
         </nav>
       </div>
+      {/* Live Broadcast */}
+      <div className="space-y-1">
+        <p className="text-slate-500 text-xs font-semibold uppercase tracking-wider px-3 py-2">
+          Live Broadcast
+        </p>
+
+        <Link
+          href="/territory"
+          className="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-all text-sm"
+        >
+          <Globe size={16} className="text-cyan-400" />
+          <span>Territory Geo-Fence</span>
+        </Link>
+      </div>
 
       {/* Divider */}
       <div className="h-px mx-3 mb-3" style={{ background: 'var(--st-border-subtle)' }} />

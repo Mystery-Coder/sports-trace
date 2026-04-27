@@ -48,3 +48,31 @@ export interface RouteAlternative {
   }>;
   computedAt: string;
 }
+
+export interface TerritoryLicense {
+  id: string;
+  matchId: string;
+  matchName: string;
+  licensedCountries: string[];
+  createdAt: string;
+  status: 'active' | 'expired';
+}
+
+export interface TerritoryCheck {
+  lat: number;
+  lng: number;
+  country: string;
+  countryCode: string;
+}
+
+export interface TerritoryViolation {
+  id: string;
+  matchId: string;
+  viewerLat: number;
+  viewerLng: number;
+  viewerCountry: string;
+  viewerCountryCode: string;
+  licensedCountries: string[];
+  result: 'granted' | 'blocked';
+  timestamp: string;
+}

@@ -3,8 +3,7 @@
 import { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { v4 as uuidv4 } from 'uuid';
-import { ScanSearch, MapPin, Clock, Monitor, CheckCircle, AlertTriangle, XCircle, Radio } from 'lucide-react';
-
+import { ScanSearch, MapPin, Clock, Monitor, CheckCircle, AlertTriangle, XCircle, Radio, Globe } from 'lucide-react';
 import Header from '@/components/Header';
 import FileUpload from '@/components/FileUpload';
 import { useSportTraceStore } from '@/lib/store';
@@ -19,6 +18,11 @@ export default function DecodePage() {
   const [decodeResult, setDecodeResult] = useState<{ token: string | null; confidence: number; assetMatch: boolean; assetName?: string } | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const { assets, addPing, addEnforcement } = useSportTraceStore();
+  const [territoryCheck, setTerritoryCheck] = useState<{
+  result: 'granted' | 'blocked';
+  country?: string;
+  matchName?: string;
+  } | null>(null);
 
   const handleFileSelected = async (file: File) => {
     if (!file.type.startsWith('image/')) {
@@ -63,37 +67,80 @@ export default function DecodePage() {
 
       // If token found, fire a detection ping
       if (result.token) {
-        const isLicensed = Math.random() > 0.6; // Demo: 40% chance unlicensed
-        const ping: DetectionPing = {
+      // Step 1: Get real GPS from browser
+      const gps = await new Promise<{ lat: number; lng: number }>((resolve) => {
+        navigator.geolocation.getCurrentPosition(
+          (pos) => resolve({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+          () => resolve({ lat: 12.97 + Math.random() * 2, lng: 77.59 + Math.random() * 2 }) // fallback
+        );
+      });
+
+      // Step 2: Check territory license via M5
+      let isLicensed = false;
+      let territoryResult: { result: 'granted' | 'blocked'; country?: string; matchName?: string } | null = null;
+
+      try {
+        // Use the first active license for demo — in production would match by asset
+        const licensesRes = await fetch('/api/territory/license');
+        const licensesData = await licensesRes.json();
+        const activeLicense = licensesData.licenses?.[0];
+
+        if (activeLicense) {
+          const checkRes = await fetch('/api/territory/check', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              matchId: activeLicense.matchId,
+              lat: gps.lat,
+              lng: gps.lng,
+            }),
+          });
+          const checkData = await checkRes.json();
+          territoryResult = checkData;
+          isLicensed = checkData.result === 'granted';
+        } else {
+          // No license set up — default to licensed
+          isLicensed = true;
+        }
+      } catch (err) {
+        console.error('Territory check failed:', err);
+        isLicensed = true; // Fail open for demo
+      }
+
+      // Step 3: Build ping with real GPS + real license status
+      const ping: DetectionPing = {
+        id: uuidv4(),
+        assetId: matchedAsset?.id || 'unknown',
+        watermarkToken: result.token,
+        timestamp: Date.now(),
+        gps,
+        platform: ['Chrome Browser', 'Firefox', 'Safari', 'Mobile App'][Math.floor(Math.random() * 4)],
+        userAgent: navigator.userAgent,
+        ipAddress: '192.168.' + Math.floor(Math.random() * 255) + '.' + Math.floor(Math.random() * 255),
+        action: isLicensed ? 'log' : Math.random() > 0.5 ? 'offer' : 'dmca',
+        isLicensed,
+      };
+
+      await addPing(ping);
+
+      // Step 4: If unlicensed, create enforcement action
+      if (!isLicensed) {
+        const enforcement: EnforcementAction = {
           id: uuidv4(),
           assetId: matchedAsset?.id || 'unknown',
-          watermarkToken: result.token,
-          timestamp: Date.now(),
-          gps: { lat: 12.97 + Math.random() * 2, lng: 77.59 + Math.random() * 2 },
-          platform: ['Chrome Browser', 'Firefox', 'Safari', 'Mobile App'][Math.floor(Math.random() * 4)],
-          userAgent: navigator.userAgent,
-          ipAddress: '192.168.' + Math.floor(Math.random() * 255) + '.' + Math.floor(Math.random() * 255),
-          action: isLicensed ? 'log' : Math.random() > 0.5 ? 'offer' : 'dmca',
-          isLicensed,
+          pingId: ping.id,
+          type: ping.action === 'dmca' ? 'dmca' : 'micro-license',
+          status: 'pending',
+          severity: ping.action === 'dmca' ? 'high' : 'medium',
+          evidence: { timestamp: ping.timestamp, gps: ping.gps, platform: ping.platform },
+          createdAt: Date.now(),
         };
-
-        await addPing(ping);
-
-        // If unlicensed, create enforcement action
-        if (!isLicensed) {
-          const enforcement: EnforcementAction = {
-            id: uuidv4(),
-            assetId: matchedAsset?.id || 'unknown',
-            pingId: ping.id,
-            type: ping.action === 'dmca' ? 'dmca' : 'micro-license',
-            status: 'pending',
-            severity: ping.action === 'dmca' ? 'high' : 'medium',
-            evidence: { timestamp: ping.timestamp, gps: ping.gps, platform: ping.platform },
-            createdAt: Date.now(),
-          };
-          await addEnforcement(enforcement);
-        }
+        await addEnforcement(enforcement);
       }
+
+      // Step 5: Show territory result in UI
+      setTerritoryCheck(territoryResult);
+    }
 
       setTimeout(() => setStage('result'), 500);
     } catch {
@@ -190,6 +237,31 @@ export default function DecodePage() {
                       A detection ping with GPS coordinates, platform context, and timestamp has been recorded. Check the Dashboard or Enforcement Queue for actions.
                     </p>
                   </div>
+
+                  {/* Territory Check Result */}
+                  {territoryCheck && (
+                    <div className={`glass-card p-6 border ${
+                      territoryCheck.result === 'granted'
+                        ? 'border-green-500/30 bg-green-500/5'
+                        : 'border-red-500/30 bg-red-500/5'
+                    }`}>
+                      <div className="flex items-center gap-2 mb-3">
+                        <Globe size={16} style={{ color: territoryCheck.result === 'granted' ? '#22c55e' : '#ef4444' }} />
+                        <h4 className="text-sm font-semibold" style={{ color: 'var(--st-text-primary)' }}>
+                          M5 Territory Check
+                        </h4>
+                        <span className={`badge ${territoryCheck.result === 'granted' ? 'badge-green' : 'badge-red'}`}>
+                          {territoryCheck.result === 'granted' ? 'Licensed Territory' : '451 Blocked'}
+                        </span>
+                      </div>
+                      <p className="text-xs" style={{ color: 'var(--st-text-secondary)' }}>
+                        {territoryCheck.result === 'granted'
+                          ? `Viewer in ${territoryCheck.country} — licensed to watch ${territoryCheck.matchName}`
+                          : `Viewer in ${territoryCheck.country} — not licensed for ${territoryCheck.matchName}. Enforcement triggered.`
+                        }
+                      </p>
+                    </div>
+                  )}
                 </>
               )}
 
