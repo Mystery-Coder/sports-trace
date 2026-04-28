@@ -150,6 +150,9 @@ export default function RoutesPage() {
     const fetchRoutes = async () => {
       try {
         const disruptionId = localStorage.getItem('disruptionId');
+        const savedOrigin = localStorage.getItem('routeOrigin') || 'Mumbai';
+        const savedDestination = localStorage.getItem('routeDestination') || 'Chennai';
+
 
         if (!disruptionId) {
           setError('No disruption ID found. Please analyse a route first.');
@@ -158,14 +161,14 @@ export default function RoutesPage() {
         }
 
         const response = await fetch('/api/reroute', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            disruptionId,
-            origin: 'Mumbai',
-            destination: 'Chennai',
-          }),
-        });
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    disruptionId,
+    origin: savedOrigin,
+    destination: savedDestination,
+  }),
+});
 
         if (!response.ok) {
           throw new Error(`Failed to fetch routes: ${response.statusText}`);

@@ -149,6 +149,8 @@ export default function DisruptionPage() {
       const data = await response.json();
       setResult(data);
       localStorage.setItem('disruptionId', data.id);
+      localStorage.setItem('routeOrigin', origin);
+      localStorage.setItem('routeDestination', destination);
     } catch (err) {
       setError(
         err instanceof Error ? err.message : 'An error occurred'

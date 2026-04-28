@@ -84,8 +84,9 @@ export default function RouteMap({
   };
   const [routeCoords, setRouteCoords] = useState<[number, number][]>([]);
   
-  const originCoords = coords[origin] || [20, 77];
-  const destCoords = coords[destination] || [20, 77];
+  const [originCoords, setOriginCoords] = useState<[number, number]>([20, 77]);
+  const [destCoords, setDestCoords] = useState<[number, number]>([20, 77]);
+  const [coordsReady, setCoordsReady] = useState(false);
   const routePoints =
   mode === 'road'
     ? routeCoords.length > 0
@@ -99,6 +100,29 @@ export default function RouteMap({
   (originCoords[1] + destCoords[1]) / 2,
 ];
 
+async function geocodeCity(city: string): Promise<[number, number]> {
+  // Check cache first — instant for known cities
+  const cached = coords[city];
+  if (cached) return cached;
+
+  // Unknown city — ask Nominatim
+  try {
+    const res = await fetch(
+      `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(city)},India&format=json&limit=1`,
+      { headers: { 'User-Agent': 'SportTrace/1.0' } }
+    );
+    const data = await res.json();
+    if (data.length > 0) {
+      return [parseFloat(data[0].lat), parseFloat(data[0].lon)];
+    }
+  } catch (err) {
+    console.error('Geocoding failed for', city);
+  }
+
+  // Last resort — center of India
+  return [20, 77];
+}
+
 
 const weatherPoints = routePoints.slice(0, 5).map((pt, i) => ({
   position: pt,
@@ -106,28 +130,46 @@ const weatherPoints = routePoints.slice(0, 5).map((pt, i) => ({
 }));
 
 useEffect(() => {
-  if (mode !== 'road') return;
+  const loadAndFetch = async () => {
+    setCoordsReady(false);
+    setRouteCoords([]);
 
-  const fetchRoute = async () => {
-    try {
-      const url = `https://router.project-osrm.org/route/v1/driving/${originCoords[1]},${originCoords[0]};${destCoords[1]},${destCoords[0]}?overview=full&geometries=geojson`;
+    const [oCoords, dCoords] = await Promise.all([
+      geocodeCity(origin),
+      geocodeCity(destination),
+    ]);
 
-      const res = await fetch(url);
-      const data = await res.json();
+    setOriginCoords(oCoords);
+    setDestCoords(dCoords);
+    setCoordsReady(true);
 
-      const coords = data.routes[0].geometry.coordinates.map(
-        ([lng, lat]: [number, number]) => [lat, lng]
-      );
-
-      setRouteCoords(coords);
-    } catch (err) {
-      console.error('OSRM failed, fallback to straight line');
-      setRouteCoords(createLine(originCoords, destCoords));
+    // Now fetch road route if needed
+    if (mode === 'road') {
+      try {
+        const url = `https://router.project-osrm.org/route/v1/driving/${oCoords[1]},${oCoords[0]};${dCoords[1]},${dCoords[0]}?overview=full&geometries=geojson`;
+        const res = await fetch(url);
+        const data = await res.json();
+        const routeData = data.routes[0].geometry.coordinates.map(
+          ([lng, lat]: [number, number]) => [lat, lng] as [number, number]
+        );
+        setRouteCoords(routeData);
+      } catch (err) {
+        console.error('OSRM failed');
+        setRouteCoords(createLine(oCoords, dCoords));
+      }
     }
   };
 
-  fetchRoute();
+  loadAndFetch();
 }, [origin, destination, mode]);
+
+if (!coordsReady) {
+  return (
+    <div className="rounded-lg border border-slate-700 h-48 flex items-center justify-center bg-slate-900/50">
+      <p className="text-slate-500 text-xs animate-pulse">Loading map...</p>
+    </div>
+  );
+}
 
 
   return (
