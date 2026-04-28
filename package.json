@@ -1,36 +1,36 @@
 {
-  "name": "sports-trace",
-  "version": "0.1.0",
-  "private": true,
-  "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "eslint"
-  },
-  "dependencies": {
-    "firebase": "^12.12.1",
-    "framer-motion": "^12.38.0",
-    "leaflet": "^1.9.4",
-    "lucide-react": "^1.8.0",
-    "next": "16.2.4",
-    "react": "19.2.4",
-    "react-dom": "19.2.4",
-    "react-leaflet": "^5.0.0",
-    "recharts": "^3.8.1",
-    "uuid": "^14.0.0",
-    "zustand": "^5.0.12"
-  },
-  "devDependencies": {
-    "@tailwindcss/postcss": "^4",
-    "@types/leaflet": "^1.9.21",
-    "@types/node": "^20",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
-    "@types/uuid": "^10.0.0",
-    "eslint": "^9",
-    "eslint-config-next": "16.2.4",
-    "tailwindcss": "^4",
-    "typescript": "^5"
-  }
+	"name": "sports-trace",
+	"version": "0.1.0",
+	"private": true,
+	"scripts": {
+		"dev": "next dev",
+		"build": "next build",
+		"start": "next start",
+		"lint": "eslint"
+	},
+	"dependencies": {
+		"firebase": "^12.12.1",
+		"framer-motion": "^12.38.0",
+		"leaflet": "^1.9.4",
+		"lucide-react": "^1.8.0",
+		"next": "16.2.4",
+		"react": "19.2.4",
+		"react-dom": "19.2.4",
+		"react-leaflet": "^5.0.0",
+		"recharts": "^3.8.1",
+		"uuid": "^14.0.0",
+		"zustand": "^5.0.12"
+	},
+	"devDependencies": {
+		"@tailwindcss/postcss": "^4",
+		"@types/leaflet": "^1.9.21",
+		"@types/node": "^20",
+		"@types/react": "^19",
+		"@types/react-dom": "^19",
+		"@types/uuid": "^10.0.0",
+		"eslint": "^9",
+		"eslint-config-next": "16.2.4",
+		"tailwindcss": "^4",
+		"typescript": "^5"
+	}
 }
