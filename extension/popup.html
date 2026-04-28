@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=420, initial-scale=1.0">
+  <title>SportTrace Scanner</title>
+  <link rel="stylesheet" href="popup.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+  <!-- Header -->
+  <header id="header">
+    <div class="header-brand">
+      <div class="logo-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          <path d="M9 12l2 2 4-4" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div>
+        <h1 class="header-title">SportTrace</h1>
+        <p class="header-subtitle">Anti-Piracy Scanner</p>
+      </div>
+    </div>
+    <div class="header-badge" id="statusBadge">READY</div>
+  </header>
+
+  <!-- Page Info -->
+  <div class="page-info" id="pageInfo">
+    <div class="page-url" id="pageUrl">—</div>
+  </div>
+
+  <!-- Scan Button -->
+  <div class="scan-section" id="scanSection">
+    <button id="scanBtn" class="scan-btn">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8"/>
+        <path d="M21 21l-4.35-4.35"/>
+      </svg>
+      <span>Scan Page for Watermarks</span>
+    </button>
+    <p class="scan-hint">Detects invisible DNA watermarks in images &amp; videos</p>
+  </div>
+
+  <!-- Scanning Animation -->
+  <div class="scanning-section hidden" id="scanningSection">
+    <div class="scanner-ring">
+      <div class="scanner-ring-inner"></div>
+      <div class="scanner-pulse"></div>
+    </div>
+    <p class="scanning-text">Scanning media elements...</p>
+    <div class="progress-bar">
+      <div class="progress-fill" id="progressFill"></div>
+    </div>
+  </div>
+
+  <!-- Results -->
+  <div class="results-section hidden" id="resultsSection">
+    <!-- Stats Row -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-value" id="mediaCount">0</div>
+        <div class="stat-label">Media Found</div>
+      </div>
+      <div class="stat-card stat-watermarks">
+        <div class="stat-value" id="watermarkCount">0</div>
+        <div class="stat-label">Watermarks</div>
+      </div>
+      <div class="stat-card stat-enforcements">
+        <div class="stat-value" id="enforcementCount">0</div>
+        <div class="stat-label">Enforcements</div>
+      </div>
+    </div>
+
+    <!-- Detection Cards -->
+    <div class="detections-list" id="detectionsList"></div>
+
+    <!-- No Watermarks Message -->
+    <div class="no-watermarks hidden" id="noWatermarks">
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color: #4ade80">
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+        <path d="M9 12l2 2 4-4" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <p class="no-wm-title">Page is Clean</p>
+      <p class="no-wm-text">No watermarked content detected on this page</p>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <span>SportTrace Extension v1.0</span>
+    <span>·</span>
+    <span>Firestore Connected</span>
+  </footer>
+
+  <script src="popup.js"></script>
+</body>
+</html>

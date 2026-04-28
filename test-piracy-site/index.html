@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SportzFree — Watch Live Sports FREE</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+    :root {
+      --bg: #0b0d12;
+      --bg-card: #13161d;
+      --bg-card-hover: #1a1e28;
+      --border: #1e2230;
+      --text: #e8ecf2;
+      --text-dim: #6b7280;
+      --accent: #ef4444;
+      --accent-glow: rgba(239, 68, 68, 0.3);
+      --gold: #fbbf24;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ─── Navbar ──────────────────────────────────────────────────────────── */
+    nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 32px;
+      background: rgba(11, 13, 18, 0.95);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(12px);
+    }
+
+    .nav-brand {
+      font-size: 22px;
+      font-weight: 900;
+      color: var(--accent);
+      letter-spacing: -0.5px;
+    }
+
+    .nav-brand span { color: var(--gold); }
+
+    .nav-links {
+      display: flex;
+      gap: 24px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--text-dim);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 600;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover { color: var(--text); }
+
+    .nav-badge {
+      background: var(--accent);
+      color: white;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 20px;
+    }
+
+    /* ─── Hero ────────────────────────────────────────────────────────────── */
+    .hero {
+      text-align: center;
+      padding: 48px 32px 24px;
+      background: linear-gradient(180deg, rgba(239, 68, 68, 0.08) 0%, transparent 60%);
+    }
+
+    .hero h1 {
+      font-size: 36px;
+      font-weight: 900;
+      margin-bottom: 8px;
+      letter-spacing: -1px;
+    }
+
+    .hero h1 span { color: var(--accent); }
+
+    .hero p {
+      color: var(--text-dim);
+      font-size: 14px;
+      max-width: 500px;
+      margin: 0 auto;
+    }
+
+    .live-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      color: var(--accent);
+      font-size: 11px;
+      font-weight: 700;
+      padding: 6px 14px;
+      border-radius: 20px;
+      margin-bottom: 16px;
+      letter-spacing: 0.5px;
+    }
+
+    .live-dot {
+      width: 6px;
+      height: 6px;
+      background: var(--accent);
+      border-radius: 50%;
+      animation: blink 1.5s infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    /* ─── Content Grid ───────────────────────────────────────────────────── */
+    .content-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 16px;
+      padding: 24px 32px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .content-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .content-card:hover {
+      border-color: rgba(239, 68, 68, 0.4);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    .card-image {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+      display: block;
+      background: #1a1e28;
+    }
+
+    .card-body {
+      padding: 14px 16px;
+    }
+
+    .card-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .card-tag {
+      font-size: 9px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .tag-live { background: rgba(239, 68, 68, 0.2); color: var(--accent); }
+    .tag-hd { background: rgba(251, 191, 36, 0.2); color: var(--gold); }
+    .tag-premium { background: rgba(168, 85, 247, 0.2); color: #a855f7; }
+
+    .card-title {
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .card-desc {
+      font-size: 11px;
+      color: var(--text-dim);
+    }
+
+    .card-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      border-top: 1px solid var(--border);
+    }
+
+    .viewers {
+      font-size: 10px;
+      color: var(--text-dim);
+    }
+
+    .play-btn {
+      background: var(--accent);
+      color: white;
+      border: none;
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    /* ─── Video Section ──────────────────────────────────────────────────── */
+    .video-section {
+      padding: 24px 32px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .section-title {
+      font-size: 18px;
+      font-weight: 800;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .section-title .accent { color: var(--accent); }
+
+    .video-player {
+      width: 100%;
+      max-width: 800px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: #000;
+    }
+
+    /* ─── Footer ──────────────────────────────────────────────────────────── */
+    .site-footer {
+      text-align: center;
+      padding: 24px;
+      border-top: 1px solid var(--border);
+      margin-top: 40px;
+    }
+
+    .site-footer p {
+      font-size: 11px;
+      color: var(--text-dim);
+    }
+
+    /* ─── Watermark Status Banner (hidden by default) ────────────────────── */
+    .wm-status {
+      display: none;
+      position: fixed;
+      bottom: 16px;
+      right: 16px;
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      color: #10b981;
+      padding: 10px 16px;
+      border-radius: 10px;
+      font-size: 11px;
+      font-weight: 600;
+      z-index: 1000;
+      backdrop-filter: blur(10px);
+    }
+
+    .wm-status.active { display: block; }
+  </style>
+</head>
+<body>
+
+  <!-- Watermark status indicator -->
+  <div class="wm-status" id="wmStatus">✓ Watermarks embedded — Ready for extension scan</div>
+
+  <!-- Navbar -->
+  <nav>
+    <div class="nav-brand">Sportz<span>Free</span>.io</div>
+    <ul class="nav-links">
+      <li><a href="#">Live</a></li>
+      <li><a href="#">Replays</a></li>
+      <li><a href="#">Schedule</a></li>
+      <li><a href="#">Premium</a></li>
+    </ul>
+    <span class="nav-badge">🔴 3 LIVE NOW</span>
+  </nav>
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="live-badge"><div class="live-dot"></div>LIVE STREAMS AVAILABLE</div>
+    <h1>Watch <span>Premium Sports</span> Free</h1>
+    <p>Stream exclusive matches, replays, and highlights — no subscription needed</p>
+  </div>
+
+  <!-- Content Grid (watermarked images injected here) -->
+  <div class="content-grid" id="contentGrid"></div>
+
+  <!-- Video Section -->
+  <div class="video-section">
+    <h2 class="section-title"><span class="accent">▶</span> Featured Replay</h2>
+    <video class="video-player" id="demoVideo" controls poster="" muted>
+      <source src="" type="video/mp4">
+      Your browser does not support video.
+    </video>
+  </div>
+
+  <!-- Footer -->
+  <div class="site-footer">
+    <p>⚠ This is a TEST piracy site for SportTrace extension demo purposes only.</p>
+    <p style="margin-top:4px">All content is synthetically generated and watermarked. No real pirated content is hosted here.</p>
+  </div>
+
+  <script>
+    // ─── Watermark Constants (same as extension decoder) ──────────────────
+    const MAGIC_HEADER = '10101010';
+    const SPREAD_FACTOR = 16;
+    const CHANNEL = 2;
+    const PIXEL_STRIDE = 4;
+
+    function tokenToBinary(token) {
+      return token.split('').map(c => parseInt(c, 16).toString(2).padStart(4, '0')).join('');
+    }
+
+    function embedImageWatermark(imageData, token) {
+      const data = imageData.data;
+      const totalPixels = imageData.width * imageData.height;
+      const tokenBinary = tokenToBinary(token);
+      const payload = MAGIC_HEADER + tokenBinary;
+      const spreadPayload = payload.split('').map(bit => bit.repeat(SPREAD_FACTOR)).join('');
+      const bitsNeeded = spreadPayload.length;
+
+      if (bitsNeeded > totalPixels) return false;
+
+      const step = Math.max(1, Math.floor(totalPixels / bitsNeeded));
+
+      for (let i = 0; i < spreadPayload.length; i++) {
+        const pixelIndex = (i * step) % totalPixels;
+        const byteIndex = pixelIndex * PIXEL_STRIDE + CHANNEL;
+        const bit = parseInt(spreadPayload[i], 10);
+        data[byteIndex] = (data[byteIndex] & 0xFE) | bit;
+      }
+      return true;
+    }
+
+    // ─── Firestore REST API Helper ────────────────────────────────────────
+    const FIREBASE_PROJECT = 'sports-trace';
+    const FIREBASE_API_KEY = 'AIzaSyBjYaFZnm0E95Qg05YXeSV0HIjHBqJ6c40';
+    const FIRESTORE_BASE = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT}/databases/(default)/documents`;
+
+    function toFirestoreValue(val) {
+      if (val === null || val === undefined) return { nullValue: null };
+      if (typeof val === 'string') return { stringValue: val };
+      if (typeof val === 'number') {
+        if (Number.isInteger(val)) return { integerValue: String(val) };
+        return { doubleValue: val };
+      }
+      if (typeof val === 'boolean') return { booleanValue: val };
+      if (typeof val === 'object' && !Array.isArray(val)) {
+        const fields = {};
+        for (const [k, v] of Object.entries(val)) fields[k] = toFirestoreValue(v);
+        return { mapValue: { fields } };
+      }
+      return { stringValue: String(val) };
+    }
+
+    function toFirestoreFields(obj) {
+      const fields = {};
+      for (const [k, v] of Object.entries(obj)) fields[k] = toFirestoreValue(v);
+      return fields;
+    }
+
+    async function writeFirestoreDoc(collection, docId, data) {
+      const url = `${FIRESTORE_BASE}/${collection}/${docId}?key=${FIREBASE_API_KEY}`;
+      try {
+        await fetch(url, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ fields: toFirestoreFields(data) }),
+        });
+        return true;
+      } catch (e) {
+        console.error('Firestore write failed:', e);
+        return false;
+      }
+    }
+
+    function generateId() {
+      return 'xxxxxxxxxxxx4xxxyxxxxxxxxxxxxxxx'.replace(/[xy]/g, c => {
+        const r = (Math.random() * 16) | 0;
+        return (c === 'x' ? r : (r & 0x3) | 0x8).toString(16);
+      });
+    }
+
+    function generateWatermarkToken(uuid) {
+      return uuid.replace(/-/g, '').slice(0, 16);
+    }
+
+    // ─── Content Data ─────────────────────────────────────────────────────
+    const matches = [
+      {
+        title: 'Champions League Final 2026',
+        desc: 'Real Madrid vs Manchester City — Full Match HD',
+        tags: ['live', 'hd'],
+        viewers: '142,891',
+        gradient: ['#1a1a2e', '#16213e', '#0f3460'],
+        text: 'UCL FINAL',
+        subtext: 'RMA 2 — 1 MCI',
+      },
+      {
+        title: 'IPL 2026 — MI vs CSK',
+        desc: 'Mumbai Indians vs Chennai Super Kings — Qualifier',
+        tags: ['live', 'premium'],
+        viewers: '89,231',
+        gradient: ['#1b1464', '#283593', '#1565c0'],
+        text: 'IPL QUALIFIER',
+        subtext: 'MI 186/4 vs CSK',
+      },
+      {
+        title: 'Premier League — Arsenal vs Liverpool',
+        desc: 'Matchday 35 Highlights — All Goals',
+        tags: ['hd'],
+        viewers: '67,412',
+        gradient: ['#b71c1c', '#880e4f', '#4a148c'],
+        text: 'PL MATCHDAY 35',
+        subtext: 'ARS 3 — 2 LIV',
+      },
+      {
+        title: 'FIFA World Cup Qualifier',
+        desc: 'Brazil vs Argentina — South American Qualifier',
+        tags: ['live', 'hd'],
+        viewers: '203,017',
+        gradient: ['#004d40', '#00695c', '#00838f'],
+        text: 'WCQ 2026',
+        subtext: 'BRA 1 — 0 ARG',
+      },
+      {
+        title: 'NBA Finals Game 7',
+        desc: 'Lakers vs Celtics — Championship Decider',
+        tags: ['premium', 'hd'],
+        viewers: '312,550',
+        gradient: ['#4a148c', '#6a1b9a', '#7b1fa2'],
+        text: 'NBA FINALS G7',
+        subtext: 'LAL 108 — 105 BOS',
+      },
+      {
+        title: 'Wimbledon Men\'s Final',
+        desc: 'Djokovic vs Alcaraz — Centre Court',
+        tags: ['live'],
+        viewers: '45,880',
+        gradient: ['#1b5e20', '#2e7d32', '#388e3c'],
+        text: 'WIMBLEDON',
+        subtext: 'DJO 6-4, 3-6, 7-5',
+      },
+    ];
+
+    // ─── Generate & Watermark Images ──────────────────────────────────────
+    const grid = document.getElementById('contentGrid');
+
+    async function initSite() {
+      for (const match of matches) {
+        const assetId = generateId();
+        const token = generateWatermarkToken(assetId);
+        match._token = token;
+        match._assetId = assetId;
+
+        // Create synthetic sports image via canvas
+        const canvas = document.createElement('canvas');
+        canvas.width = 640;
+        canvas.height = 360;
+        const ctx = canvas.getContext('2d');
+
+        // Gradient background
+        const grad = ctx.createLinearGradient(0, 0, 640, 360);
+        grad.addColorStop(0, match.gradient[0]);
+        grad.addColorStop(0.5, match.gradient[1]);
+        grad.addColorStop(1, match.gradient[2]);
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, 640, 360);
+
+        // Grid pattern overlay
+        ctx.strokeStyle = 'rgba(255,255,255,0.03)';
+        ctx.lineWidth = 1;
+        for (let x = 0; x < 640; x += 20) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, 360); ctx.stroke(); }
+        for (let y = 0; y < 360; y += 20) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(640, y); ctx.stroke(); }
+
+        // Main text
+        ctx.fillStyle = 'rgba(255,255,255,0.9)';
+        ctx.font = '900 42px Inter, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(match.text, 320, 160);
+
+        // Score / subtext
+        ctx.fillStyle = 'rgba(255,255,255,0.7)';
+        ctx.font = '700 28px Inter, sans-serif';
+        ctx.fillText(match.subtext, 320, 210);
+
+        // LIVE indicator
+        if (match.tags.includes('live')) {
+          ctx.fillStyle = '#ef4444';
+          ctx.beginPath();
+          ctx.arc(270, 260, 5, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.fillStyle = 'rgba(239,68,68,0.9)';
+          ctx.font = '700 14px Inter, sans-serif';
+          ctx.fillText('● LIVE', 320, 265);
+        }
+
+        // Watermark logo text (subtle)
+        ctx.fillStyle = 'rgba(255,255,255,0.1)';
+        ctx.font = '600 12px Inter, sans-serif';
+        ctx.fillText('EXCLUSIVE BROADCAST', 320, 330);
+
+        // Get ImageData, embed watermark
+        const imageData = ctx.getImageData(0, 0, 640, 360);
+        const success = embedImageWatermark(imageData, token);
+
+        if (success) {
+          // Put watermarked data back
+          ctx.putImageData(imageData, 0, 0);
+        }
+
+        // Create card
+        const card = document.createElement('div');
+        card.className = 'content-card';
+
+        const img = document.createElement('img');
+        img.className = 'card-image';
+        img.src = canvas.toDataURL('image/png');
+        img.alt = match.title;
+        img.setAttribute('data-token', token);
+        img.setAttribute('data-asset-id', assetId);
+
+        const tagsHtml = match.tags.map(t =>
+          `<span class="card-tag tag-${t}">${t.toUpperCase()}</span>`
+        ).join('');
+
+        card.innerHTML = `
+          <div class="card-body">
+            <div class="card-meta">${tagsHtml}</div>
+            <div class="card-title">${match.title}</div>
+            <div class="card-desc">${match.desc}</div>
+          </div>
+          <div class="card-footer">
+            <span class="viewers">👁 ${match.viewers} watching</span>
+            <button class="play-btn">▶ Watch</button>
+          </div>
+        `;
+
+        // Insert image before card-body
+        card.insertBefore(img, card.firstChild);
+        grid.appendChild(card);
+
+        // Register asset in Firestore
+        await writeFirestoreDoc('assets', assetId, {
+          id: assetId,
+          name: match.title,
+          owner: 'SportTrace Demo',
+          type: 'image',
+          watermarkToken: token,
+          hash: assetId,
+          hmacSignature: 'demo-sig-' + assetId.slice(0, 8),
+          originalUrl: '',
+          watermarkedUrl: '',
+          fileSize: 0,
+          createdAt: Date.now(),
+          pingCount: 0,
+          status: 'active',
+        });
+      }
+
+      // Show status
+      document.getElementById('wmStatus').classList.add('active');
+      console.log('✅ All images watermarked and registered in Firestore');
+      console.log('Tokens:', matches.map(m => ({ title: m.title, token: m._token })));
+    }
+
+    // Also create a watermarked video poster
+    async function createVideoPoster() {
+      const canvas = document.createElement('canvas');
+      canvas.width = 1280;
+      canvas.height = 720;
+      const ctx = canvas.getContext('2d');
+
+      const grad = ctx.createLinearGradient(0, 0, 1280, 720);
+      grad.addColorStop(0, '#0f172a');
+      grad.addColorStop(0.5, '#1e1b4b');
+      grad.addColorStop(1, '#0f172a');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, 1280, 720);
+
+      ctx.fillStyle = 'rgba(255,255,255,0.8)';
+      ctx.font = '900 48px Inter, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('CHAMPIONS LEAGUE 2026', 640, 320);
+
+      ctx.fillStyle = 'rgba(255,255,255,0.5)';
+      ctx.font = '600 24px Inter, sans-serif';
+      ctx.fillText('Full Match Replay — Premium Content', 640, 380);
+
+      // Draw play button
+      ctx.fillStyle = 'rgba(239, 68, 68, 0.8)';
+      ctx.beginPath();
+      ctx.arc(640, 460, 32, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = 'white';
+      ctx.beginPath();
+      ctx.moveTo(630, 445);
+      ctx.lineTo(630, 475);
+      ctx.lineTo(658, 460);
+      ctx.closePath();
+      ctx.fill();
+
+      // Watermark the poster
+      const assetId = generateId();
+      const token = generateWatermarkToken(assetId);
+      const imageData = ctx.getImageData(0, 0, 1280, 720);
+      embedImageWatermark(imageData, token);
+      ctx.putImageData(imageData, 0, 0);
+
+      document.getElementById('demoVideo').poster = canvas.toDataURL('image/png');
+
+      // Register in Firestore
+      await writeFirestoreDoc('assets', assetId, {
+        id: assetId,
+        name: 'Champions League 2026 — Full Match Replay',
+        owner: 'SportTrace Demo',
+        type: 'video',
+        watermarkToken: token,
+        hash: assetId,
+        hmacSignature: 'demo-sig-' + assetId.slice(0, 8),
+        originalUrl: '',
+        watermarkedUrl: '',
+        fileSize: 0,
+        createdAt: Date.now(),
+        pingCount: 0,
+        status: 'active',
+      });
+    }
+
+    // Initialize
+    initSite().then(() => createVideoPoster());
+  </script>
+</body>
+</html>
