@@ -14,6 +14,7 @@ export interface WeatherSignal {
   tempC: number;
   rainMmPerHour: number;
   windKmh: number;
+  humidity: number;
   condition: string;
   riskPoints: number;
 }

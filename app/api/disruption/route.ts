@@ -12,6 +12,8 @@ interface DisruptionRequestBody {
   origin: string;
   destination: string;
   routeId: string;
+  newsSignals?: NewsSignal[];
+  forecastDate?: string;
 }
 
 export async function POST(request: NextRequest) {
@@ -37,10 +39,13 @@ export async function POST(request: NextRequest) {
     // Step 1: Call weather API
     let weatherSignals: WeatherSignal[] = [];
     try {
-      const weatherUrl = `${baseUrl}/api/weather?cities=${encodeURIComponent(
-        origin
-      )},${encodeURIComponent(destination)}`;
+      // const weatherUrl = `${baseUrl}/api/weather?cities=${encodeURIComponent(
+      //   origin
+      // )},${encodeURIComponent(destination)}`;
+      const weatherUrl = `${baseUrl}/api/weather?cities=${encodeURIComponent(origin)},${encodeURIComponent(destination)}${body.forecastDate ? `&date=${body.forecastDate}` : ''}`;
       const weatherResponse = await fetch(weatherUrl);
+      console.log('Weather URL:', weatherUrl);
+      console.log('Forecast date received:', body.forecastDate);
 
       if (weatherResponse.ok) {
         const weatherData = await weatherResponse.json();
@@ -51,25 +56,27 @@ export async function POST(request: NextRequest) {
     } catch (error) {
       console.error('Error calling weather API:', error);
     }
-
+    
+    
     // Step 2: Call news API
-    let newsSignals: NewsSignal[] = [];
-    try {
-      const newsQuery = `${origin} ${destination} port disruption`;
-      const newsUrl = `${baseUrl}/api/news?query=${encodeURIComponent(
-        newsQuery
-      )}`;
-      const newsResponse = await fetch(newsUrl);
+    let newsSignals: NewsSignal[] = body.newsSignals || [];
+    // let newsSignals: NewsSignal[] = [];
+    // try {
+    //   const newsQuery = `${origin} ${destination} transport India`;
+    //   const newsUrl = `${baseUrl}/api/news?query=${encodeURIComponent(
+    //     newsQuery
+    //   )}`;
+    //   const newsResponse = await fetch(newsUrl);
 
-      if (newsResponse.ok) {
-        const newsData = await newsResponse.json();
-        newsSignals = newsData.signals || [];
-      } else {
-        console.warn('News API failed:', newsResponse.statusText);
-      }
-    } catch (error) {
-      console.error('Error calling news API:', error);
-    }
+    //   if (newsResponse.ok) {
+    //     const newsData = await newsResponse.json();
+    //     newsSignals = newsData.signals || [];
+    //   } else {
+    //     console.warn('News API failed:', newsResponse.statusText);
+    //   }
+    // } catch (error) {
+    //   console.error('Error calling news API:', error);
+    // }
 
     // Step 3: Compute risk score
     const riskScoreResult = computeRiskScore(weatherSignals, newsSignals);

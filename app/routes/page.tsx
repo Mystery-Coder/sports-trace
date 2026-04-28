@@ -4,7 +4,122 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Loader, Truck, Plane, Ship } from 'lucide-react';
 import { RouteAlternative } from '@/lib/disruption-types';
+import { Radar, RadarChart, PolarGrid, PolarAngleAxis, ResponsiveContainer, Legend } from 'recharts';
+import dynamic from 'next/dynamic';
 
+const RouteMap = dynamic(() => import('./RouteMap'), {
+  ssr: false,
+});
+
+
+function RouteRadarChart({ routes }: { routes: RouteAlternative['routes'] }) {
+  // Normalize each dimension to 0-100 scale (higher = better)
+  const maxCost = Math.max(...routes.map(r => r.costUSD));
+  const maxDuration = Math.max(...routes.map(r => r.durationHours));
+  const maxDistance = Math.max(...routes.map(r => r.distanceKm));
+
+  const normalize = (value: number, max: number, invert = false) => {
+    const normalized = (value / max) * 100;
+    return invert ? 100 - normalized : normalized;
+  };
+
+  // Reliability scores per mode
+  const reliabilityMap: Record<string, number> = {
+    road: 72,
+    air: 95,
+    sea: 60,
+  };
+
+  // Risk scores per mode (lower risk = higher score)
+  const riskMap: Record<string, number> = {
+    road: 55,
+    air: 85,
+    sea: 40,
+  };
+
+  const data = [
+    {
+      dimension: 'Cost Efficiency',
+      ...Object.fromEntries(
+        routes.map(r => [r.name, Math.round(normalize(r.costUSD, maxCost, true))])
+      ),
+    },
+    {
+      dimension: 'Speed',
+      ...Object.fromEntries(
+        routes.map(r => [r.name, Math.round(normalize(r.durationHours, maxDuration, true))])
+      ),
+    },
+    {
+      dimension: 'Low Risk',
+      ...Object.fromEntries(
+        routes.map(r => [r.name, riskMap[r.mode] || 50])
+      ),
+    },
+    {
+      dimension: 'Reliability',
+      ...Object.fromEntries(
+        routes.map(r => [r.name, reliabilityMap[r.mode] || 50])
+      ),
+    },
+    {
+      dimension: 'Distance',
+      ...Object.fromEntries(
+        routes.map(r => [r.name, Math.round(normalize(r.distanceKm, maxDistance, true))])
+      ),
+    },
+  ];
+
+  const COLORS = ['#06b6d4', '#f59e0b', '#8b5cf6'];
+
+  return (
+    <div className="border border-slate-700 rounded-lg p-6 bg-slate-800/40">
+      <h3 className="text-white font-semibold text-sm mb-1">Route Comparison</h3>
+      <p className="text-slate-500 text-xs mb-6">
+        5-dimension analysis — higher score = better on that dimension
+      </p>
+      <ResponsiveContainer width="100%" height={320}>
+        <RadarChart data={data} margin={{ top: 10, right: 30, bottom: 10, left: 30 }}>
+          <PolarGrid stroke="rgba(255,255,255,0.1)" />
+          <PolarAngleAxis
+            dataKey="dimension"
+            tick={{ fill: 'rgba(255,255,255,0.6)', fontSize: 12 }}
+          />
+          {routes.map((route, idx) => (
+            <Radar
+              key={route.id}
+              name={route.name}
+              dataKey={route.name}
+              stroke={COLORS[idx]}
+              fill={COLORS[idx]}
+              fillOpacity={0.15}
+              strokeWidth={2}
+            />
+          ))}
+          <Legend
+            wrapperStyle={{ color: 'rgba(255,255,255,0.6)', fontSize: 12 }}
+          />
+        </RadarChart>
+      </ResponsiveContainer>
+
+      {/* Dimension legend */}
+      <div className="grid grid-cols-5 gap-2 mt-4">
+        {[
+          { label: 'Cost Efficiency', desc: 'Lower cost scores higher' },
+          { label: 'Speed', desc: 'Faster routes score higher' },
+          { label: 'Low Risk', desc: 'Safer modes score higher' },
+          { label: 'Reliability', desc: 'Historical on-time rate' },
+          { label: 'Distance', desc: 'Shorter routes score higher' },
+        ].map((d) => (
+          <div key={d.label} className="text-center">
+            <p className="text-white text-xs font-medium">{d.label}</p>
+            <p className="text-slate-500 text-xs mt-0.5">{d.desc}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 
 export default function RoutesPage() {
@@ -221,11 +336,16 @@ export default function RoutesPage() {
                     </div>
 
                     {/* Explanation */}
-                    <div className="mb-6 p-4 border-l-2 border-slate-600 bg-slate-900/50 rounded">
-                      <p className="text-slate-300 text-sm italic leading-relaxed">
+                    <div className="mb-6 p-4 border-l-4 border-slate-600 bg-slate-900/50 rounded max-h-48 overflow-y-auto">
+                      <p className="text-slate-300 text-sm leading-relaxed text-left">
                         "{explanation}"
                       </p>
                     </div>
+                    <RouteMap
+  origin={route.origin}
+  destination={route.destination}
+  mode={route.mode}
+/>
 
                     {/* Select Button */}
                     <button className="w-full px-4 py-2 bg-slate-700/50 hover:bg-slate-700 text-slate-300 hover:text-white text-sm font-medium rounded transition"
@@ -236,6 +356,9 @@ export default function RoutesPage() {
                 );
               })}
             </div>
+
+            {/* Radar Chart */}
+            <RouteRadarChart routes={result.routes} />
 
             {/* Recommendation Section */}
             <motion.div

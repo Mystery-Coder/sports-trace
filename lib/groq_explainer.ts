@@ -14,20 +14,32 @@ export async function explainRoute(
     const systemPrompt =
       'You are a logistics analyst for a sports media company. Be concise and practical.';
 
-    const userPrompt = `Evaluate this route alternative for a sports logistics shipment:
+    const userPrompt = `You are evaluating route alternatives for a sports broadcast equipment shipment in India.
 
-Route: ${route.name}
+DISRUPTION CONTEXT:
+- Route: ${disruptionReport.origin} to ${disruptionReport.destination}
+- Risk Level: ${disruptionReport.riskLevel} (Score: ${disruptionReport.riskScore}/100)
+- Weather: ${disruptionReport.weatherSignals.map(w => 
+    `${w.city}: ${w.condition}, ${w.tempC.toFixed(1)}°C, wind ${w.windKmh.toFixed(0)}km/h`
+  ).join(' | ')}
+- Active news alerts: ${disruptionReport.newsSignals.filter(n => n.riskPoints > 0).length} risk signals
+
+ROUTE BEING EVALUATED:
+- Name: ${route.name}
+- Mode: ${route.mode}
 - Distance: ${route.distanceKm}km
 - Duration: ${route.durationHours} hours
-- Cost: $${route.costUSD}
-- Mode: ${route.mode}
+- Cost: $${route.costUSD} USD
 
-Current disruption context:
-- From: ${disruptionReport.origin} to ${disruptionReport.destination}
-- Risk Level: ${disruptionReport.riskLevel}
-- Risk Breakdown: ${disruptionReport.weatherSignals.length} weather signals, ${disruptionReport.newsSignals.length} news alerts
+EVALUATION RULES:
+- Road convoy: affected by rain, wind, road conditions, traffic. Good for cost, slow.
+- Air freight: unaffected by ground disruptions. Fast but expensive. Best for HIGH risk scenarios.
+- Coastal shipping: unaffected by road/weather inland. Cheapest but slowest. Best for LOW urgency.
 
-Is this route a good alternative? Explain why or why not in max 3 sentences, ending with one sentence recommendation.`;
+Given the ${disruptionReport.riskLevel} risk level and current weather in ${disruptionReport.origin} and ${disruptionReport.destination}:
+Write 2 sentences analyzing this specific route mode against the disruption context.
+End with exactly 1 sentence starting with "Recommendation:".
+Be specific about weather/risk impact on this transport mode. Do not be generic.`;
 
     const response = await fetch(
       'https://api.groq.com/openai/v1/chat/completions',
@@ -50,7 +62,7 @@ Is this route a good alternative? Explain why or why not in max 3 sentences, end
             },
           ],
           temperature: 0.5,
-          max_tokens: 150,
+          max_tokens: 200,
         }),
       }
     );
